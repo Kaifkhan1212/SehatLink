@@ -319,12 +319,14 @@ export const AppProvider = ({ children }) => {
 
       // 2. Sync with role-specific collection (patients or doctors)
       const role = currentUser?.role;
+      const dataToSync = { ...updatedFields, updatedAt: new Date().toISOString() };
+      
       if (role === 'patient') {
         const patientRef = doc(db, 'patients', userId);
-        await updateDoc(patientRef, { ...updatedFields, updatedAt: new Date().toISOString() });
+        await setDoc(patientRef, dataToSync, { merge: true });
       } else if (role === 'doctor') {
         const doctorRef = doc(db, 'doctors', userId);
-        await updateDoc(doctorRef, { ...updatedFields, updatedAt: new Date().toISOString() });
+        await setDoc(doctorRef, dataToSync, { merge: true });
       }
     } catch (error) {
       console.error('Error updating user profile:', error);

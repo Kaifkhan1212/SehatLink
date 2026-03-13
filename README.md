@@ -64,3 +64,15 @@ SehatLink is a premium TeleHealth platform designed to bridge the gap between ru
 
 ## 📱 Mobile Responsiveness
 SehatLink is fully responsive, optimized for both desktop browsers and mobile devices, ensuring that users in rural areas can access care on any hardware they have available.
+
+## ⚠️ Troubleshooting
+
+### AI Service (403/404 Errors)
+*   **Model Name**: Ensure you are using `gemini-2.5-flash`.
+*   **API Key**: Verify your `VITE_GEMINI_API_KEY` in `.env` is valid and active in the [Google AI Studio](https://aistudio.google.com/).
+*   **Ad-blockers**: Some ad-blockers block requests to `generativelanguage.googleapis.com`. Disable them for this site.
+
+### Firebase Connection Issues
+*   **ERR_BLOCKED_BY_CLIENT**: Usually caused by ad-blockers (uBlock, AdBlock, Brave Shield). Disable them for the site.
+*   **Offline Access**: If you see an offline banner, you are viewing cached data. Check your internet connection to sync new data.
+
