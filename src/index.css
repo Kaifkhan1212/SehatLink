@@ -1,0 +1,77 @@
+:root {
+  /* High contrast, simple color palette suitable for rural telehealth */
+  --primary: #059669;
+  /* Deep Green */
+  --primary-hover: #047857;
+  --secondary: #0ea5e9;
+  /* Clear Blue */
+  --bg-color: #f8fafc;
+  /* Soft Light Gray */
+  --surface: #ffffff;
+  /* White */
+  --text-main: #0f172a;
+  /* Dark Blue-Gray for high contrast text */
+  --text-muted: #475569;
+  /* Gray for secondary info */
+  --danger: #ef4444;
+  /* Red for alerts */
+  --success: #10b981;
+  /* Green for success states */
+  --border-color: #e2e8f0;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-xxl: 32px;
+
+  /* Spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Radii */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base App Container */
+.app-container {
+  max-width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* High visibility touch targets for rural users */
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-lg);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
