@@ -12,9 +12,9 @@ const Consultations = () => {
   const navigate = useNavigate();
   const { users, patients, doctors, consultations, updateConsultationStatus, addPrescription, healthRecords, prescriptions, currentUser } = useAppContext();
   
-  // Prioritize real logged-in doctor, fallback to mock data
-  const defaultDoc = (doctors && doctors.length > 0) ? doctors[0] : { id: 'd1', name: 'Dr. Sarah Sharma' };
-  const currentDoctor = currentUser ? { ...defaultDoc, ...currentUser } : defaultDoc;
+  // Prioritize real logged-in doctor's specific Firestore data
+  const dbDoctor = doctors.find(d => d.id === currentUser?.id);
+  const currentDoctor = currentUser ? { ...currentUser, ...(dbDoctor || {}) } : null;
 
   if (!currentDoctor) return <div className="page-container">Loading...</div>;
 
@@ -187,19 +187,21 @@ const Consultations = () => {
                   </div>
                 )}
 
-                {consult.status === 'Approved' && (
+                {(consult.status === 'Approved' || consult.status === 'Completed') && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                      <Button onClick={() => navigate('/doctor-dashboard/consultation', { state: { consultation: consult, isDoctor: true } })} fullWidth style={{ flex: '1 1 45%', backgroundColor: 'var(--secondary)' }}>
-                        <Phone size={18} /> Start Audio Call
-                      </Button>
+                      {consult.status === 'Approved' && (
+                        <Button onClick={() => navigate('/doctor-dashboard/consultation', { state: { consultation: consult, isDoctor: true } })} fullWidth style={{ flex: '1 1 45%', backgroundColor: 'var(--secondary)' }}>
+                          <Phone size={18} /> Start Audio Call
+                        </Button>
+                      )}
                       <Button
                         variant={activeChatId === consult.id ? "primary" : "outline"}
                         fullWidth
                         style={{ flex: '1 1 45%' }}
                         onClick={() => setActiveChatId(activeChatId === consult.id ? null : consult.id)}
                       >
-                        <MessageSquare size={18} /> {activeChatId === consult.id ? 'Close Chat' : 'Text Chat (Low Bandwidth)'}
+                        <MessageSquare size={18} /> {activeChatId === consult.id ? 'Close Chat' : (consult.status === 'Completed' ? 'View Chat History' : 'Text Chat (Low Bandwidth)')}
                       </Button>
                     </div>
 
@@ -209,9 +211,11 @@ const Consultations = () => {
                       </div>
                     )}
 
-                    <Button onClick={() => setPrescriptionForm(consult)} fullWidth>
-                      <Edit size={18} /> Add Medical Notes & Complete
-                    </Button>
+                    {consult.status === 'Approved' && (
+                      <Button onClick={() => setPrescriptionForm(consult)} fullWidth>
+                        <Edit size={18} /> Add Medical Notes & Complete
+                      </Button>
+                    )}
                   </div>
                 )}
               </Card>

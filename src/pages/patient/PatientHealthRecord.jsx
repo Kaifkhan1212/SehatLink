@@ -8,7 +8,7 @@ import { jsPDF } from 'jspdf';
 import './PatientHome.css';
 
 const PatientHealthRecord = () => {
-  const { currentUser, healthRecords, prescriptions, isOffline, updateUserProfile } = useAppContext();
+  const { currentUser, healthRecords, prescriptions, consultations, isOffline, updateUserProfile } = useAppContext();
   
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -320,10 +320,14 @@ const PatientHealthRecord = () => {
             <Pill className="text-secondary" /> Past Prescriptions
           </h2>
           {userPrescriptions.length > 0 ? (
-            userPrescriptions.map(pres => (
+            userPrescriptions.map(pres => {
+              const consult = consultations?.find(c => c.id === pres.consultationId);
+              const doctorName = consult?.doctorName || 'Unknown Doctor';
+              return (
               <Card key={pres.id} style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <strong>Date:</strong> {new Date(pres.date).toLocaleDateString()}
+                  <strong>Date: {new Date(pres.date).toLocaleDateString()}</strong>
+                  <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>By: {doctorName}</span>
                 </div>
                 <div style={{ background: 'var(--bg-color)', padding: '12px', borderRadius: '8px' }}>
                   <strong>Medicines:</strong>
@@ -334,7 +338,8 @@ const PatientHealthRecord = () => {
                   </ul>
                 </div>
               </Card>
-            ))
+            );
+          })
           ) : (
             <Card><p>No prescriptions found.</p></Card>
           )}
@@ -352,6 +357,11 @@ const PatientHealthRecord = () => {
                   <strong style={{ fontSize: '18px' }}>{record.condition}</strong>
                   <span style={{ color: 'var(--text-muted)' }}>{new Date(record.date).toLocaleDateString()}</span>
                 </div>
+                {record.doctorName && (
+                  <div style={{ marginBottom: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
+                    By: {record.doctorName}
+                  </div>
+                )}
                 <p>{record.notes}</p>
               </Card>
             ))

@@ -12,7 +12,7 @@ const PatientHome = () => {
   const navigate = useNavigate();
 
   const userRecords = healthRecords.filter(r => r.patientId === currentUser.id);
-  
+
   const handleEmergency = () => {
     const confirmMsg = "Are you sure you want to request an EMERGENCY consultation? Doctors will be alerted immediately.";
     if (window.confirm(confirmMsg)) {
@@ -51,7 +51,7 @@ const PatientHome = () => {
               <p>{t('bookDoctorDesc')}</p>
             </div>
           </Card>
-          
+
           <Card onClick={() => navigate('/patient-dashboard/medicine-search')} className="action-card bg-success-light" style={{ margin: 0 }}>
             <Search size={48} className="text-success" />
             <div className="action-text">
@@ -64,20 +64,20 @@ const PatientHome = () => {
         {/* Right Column: Doctor Image Placeholder */}
         <div style={{ flex: '1 1 35%', minWidth: '300px' }}>
           <Card style={{ height: '100%', margin: 0, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ 
-              height: '100%', 
+            <div style={{
+              height: '100%',
               minHeight: '300px',
               backgroundImage: 'url("https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2070&auto=format&fit=crop")',
               backgroundSize: 'cover',
               backgroundPosition: 'center top',
               position: 'relative'
             }}>
-              <div style={{ 
-                position: 'absolute', 
-                bottom: 0, 
-                left: 0, 
-                right: 0, 
-                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)', 
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                 padding: '32px 24px 24px',
                 color: 'white'
               }}>
@@ -94,7 +94,7 @@ const PatientHome = () => {
           <UserCheck size={24} className="text-primary" /> Available Doctors
         </h2>
         {doctors.length > 0 ? (
-          <div style={{ 
+          <div style={{
             display: 'flex', gap: '20px', marginTop: '16px',
             overflowX: 'auto', paddingBottom: '12px',
             scrollSnapType: 'x mandatory',
@@ -102,13 +102,13 @@ const PatientHome = () => {
           }}>
             {doctors.map((doc, index) => {
               const avatarPhotos = [
-                'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&auto=format&fit=crop',
+                'https://imgs.search.brave.com/gb8ycXb6OlOcdjkYRod48xVrsGkln1EIkfEKnQN108w/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2MxLzYz/LzIyL2MxNjMyMmM3/MDZmY2I3NmQxMGFh/MDlmODQyZDhkMjdh/LmpwZw',
                 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&auto=format&fit=crop',
                 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300&auto=format&fit=crop',
                 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=300&auto=format&fit=crop',
               ];
               return (
-                <div 
+                <div
                   key={doc.id}
                   style={{
                     background: 'white', borderRadius: '16px', overflow: 'hidden',
@@ -125,7 +125,7 @@ const PatientHome = () => {
                   {/* Doctor Photo */}
                   <div style={{
                     height: '200px',
-                    backgroundImage: `url("${avatarPhotos[index % avatarPhotos.length]}")`,
+                    backgroundImage: `url("${doc.photoUrl || avatarPhotos[index % avatarPhotos.length]}")`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center top',
                     position: 'relative'
@@ -160,8 +160,8 @@ const PatientHome = () => {
                       fontWeight: '600', fontSize: '14px', cursor: 'pointer',
                       transition: 'opacity 0.2s'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-                    onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                      onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+                      onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
                     >
                       Book Appointment →
                     </button>
@@ -178,7 +178,7 @@ const PatientHome = () => {
       </div>
 
       <div className="section mt-lg">
-        <button 
+        <button
           onClick={handleEmergency}
           style={{ width: '100%', padding: '24px', background: 'var(--danger)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(220, 38, 38, 0.3)' }}
         >
@@ -190,18 +190,18 @@ const PatientHome = () => {
       <div className="section mt-lg">
         <h2>{t('healthSummaryTitle')}</h2>
         <Card style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-           <FileText size={32} className="text-primary" />
-           <div style={{ flex: 1 }}>
-             <h4>{t('recentHistoryTitle')}</h4>
-             <p className="text-sm text-muted">
-               {userRecords.length > 0 ? `${t('latestPrefix')}${userRecords[0].condition}${t('onText')}${new Date(userRecords[0].date).toLocaleDateString()}` : t('noRecentRecords')}
-             </p>
-           </div>
-           <button 
-             onClick={() => navigate('/patient-dashboard/records')}
-             style={{ padding: '8px 16px', background: 'var(--primary)', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
-             {t('viewAllBtn')}
-           </button>
+          <FileText size={32} className="text-primary" />
+          <div style={{ flex: 1 }}>
+            <h4>{t('recentHistoryTitle')}</h4>
+            <p className="text-sm text-muted">
+              {userRecords.length > 0 ? `${t('latestPrefix')}${userRecords[0].condition}${t('onText')}${new Date(userRecords[0].date).toLocaleDateString()}` : t('noRecentRecords')}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/patient-dashboard/records')}
+            style={{ padding: '8px 16px', background: 'var(--primary)', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+            {t('viewAllBtn')}
+          </button>
         </Card>
       </div>
 
@@ -211,9 +211,9 @@ const PatientHome = () => {
           <BookOpen size={24} className="text-secondary" /> Health Articles & Tips
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          <Card 
-            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }} 
-            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} 
+          <Card
+            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             onClick={() => window.open('https://en.wikipedia.org/wiki/Cardiovascular_disease', '_blank')}
           >
@@ -221,9 +221,9 @@ const PatientHome = () => {
             <h4 style={{ marginBottom: '8px' }}>5 Ways to Maintain Heart Health in Rural Areas</h4>
             <p className="text-sm text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> 5 min read</p>
           </Card>
-          <Card 
-            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }} 
-            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} 
+          <Card
+            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             onClick={() => window.open('https://en.wikipedia.org/wiki/Allergic_rhinitis', '_blank')}
           >
@@ -231,9 +231,9 @@ const PatientHome = () => {
             <h4 style={{ marginBottom: '8px' }}>Understanding Seasonal Allergies and Remedies</h4>
             <p className="text-sm text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> 4 min read</p>
           </Card>
-          <Card 
-            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }} 
-            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} 
+          <Card
+            style={{ cursor: 'pointer', transition: 'transform 0.2s', padding: '16px' }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             onClick={() => window.open('https://en.wikipedia.org/wiki/Hand_washing', '_blank')}
           >

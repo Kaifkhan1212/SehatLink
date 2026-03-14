@@ -47,7 +47,10 @@ Provide a JSON response ONLY, with no extra text:
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch from AI service.');
+      if (response.status === 429) {
+        throw new Error('The AI is currently busy (Rate Limit reached). Please try again in 1 minute.');
+      }
+      throw new Error('Failed to reach the AI service.');
     }
 
     const data = await response.json();

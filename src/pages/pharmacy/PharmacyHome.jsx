@@ -6,14 +6,45 @@ import { Store, Package, TrendingUp } from 'lucide-react';
 import '../patient/PatientHome.css';
 
 const PharmacyHome = () => {
-  const { pharmacies, medicines } = useAppContext();
+  const { pharmacies, medicines, prescriptions } = useAppContext();
   const navigate = useNavigate();
 
   // Mocking logged in pharmacy
-  const currentPharmacy = pharmacies[0];
+  const currentPharmacy = pharmacies[0] || { name: 'Pharmacy' };
   
   const inStock = medicines.filter(m => m.inStock).length;
   const outOfStock = medicines.length - inStock;
+
+  // Calculate local demand from actual prescriptions
+  const getLocalDemandMessage = () => {
+    if (!prescriptions || prescriptions.length === 0) return "Monitoring local prescription trends...";
+    
+    const medCounts = {};
+    prescriptions.forEach(p => {
+      if (p.medicines && Array.isArray(p.medicines)) {
+        p.medicines.forEach(med => {
+          // Normalize to lowercase to group properly, but try to keep capitalized for display
+          const normalized = med.trim();
+          if (normalized) {
+            medCounts[normalized] = (medCounts[normalized] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    const sortedMeds = Object.entries(medCounts)
+       .sort((a, b) => b[1] - a[1])
+       .map(entry => entry[0]);
+
+    if (sortedMeds.length === 0) return "Monitoring local prescription trends...";
+    
+    const topMeds = sortedMeds.slice(0, 2);
+    if (topMeds.length === 1) {
+      return `High demand for ${topMeds[0]} based on recent prescriptions.`;
+    } else {
+      return `High demand for ${topMeds[0]} and ${topMeds[1]} based on recent prescriptions.`;
+    }
+  };
 
   return (
     <div className="page-container">
@@ -35,7 +66,7 @@ const PharmacyHome = () => {
           <TrendingUp size={48} className="text-secondary" />
           <div className="action-text">
             <h3>Local Demand</h3>
-            <p>High demand for Paracetamol and ORS this week.</p>
+            <p>{getLocalDemandMessage()}</p>
           </div>
         </Card>
       </div>

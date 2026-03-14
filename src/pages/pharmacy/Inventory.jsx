@@ -3,15 +3,16 @@ import { useAppContext } from '../../context/AppContext';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Check, X, Package, Plus } from 'lucide-react';
+import { Check, X, Package, Plus, Trash2 } from 'lucide-react';
 import '../patient/PatientHome.css';
 
 const Inventory = () => {
-  const { medicines, pharmacies, updateMedicineStock, addMedicine } = useAppContext();
+  const { medicines, pharmacies, updateMedicineStock, addMedicine, deleteMedicine } = useAppContext();
   const currentPharmacy = pharmacies[0];
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMedName, setNewMedName] = useState('');
+  const [newMedUses, setNewMedUses] = useState('');
   const [newMedPrice, setNewMedPrice] = useState('');
 
   const myMedicines = medicines.filter(m => m.pharmacyId === currentPharmacy.id);
@@ -27,8 +28,9 @@ const Inventory = () => {
   const handleAddMedicine = (e) => {
     e.preventDefault();
     if (newMedName.trim() && newMedPrice.trim()) {
-      addMedicine(currentPharmacy.id, newMedName, newMedPrice);
+      addMedicine(currentPharmacy.id, newMedName, newMedPrice, newMedUses);
       setNewMedName('');
+      setNewMedUses('');
       setNewMedPrice('');
       setShowAddForm(false);
     }
@@ -58,6 +60,14 @@ const Inventory = () => {
                 value={newMedName}
                 onChange={(e) => setNewMedName(e.target.value)}
                 required
+              />
+            </div>
+            <div style={{ flex: 2 }}>
+              <Input 
+                label="Uses (Used For)" 
+                placeholder="e.g., Pain relief, Fever" 
+                value={newMedUses}
+                onChange={(e) => setNewMedUses(e.target.value)}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -95,8 +105,9 @@ const Inventory = () => {
                  <Package size={24} color={med.inStock ? 'var(--success)' : 'var(--danger)'} />
                </div>
                <div>
-                 <h3 style={{ fontSize: '18px' }}>{med.name}</h3>
-                 <p style={{ color: 'var(--text-muted)' }}>Price: {med.price}</p>
+                 <h3 style={{ fontSize: '18px', marginBottom: '4px' }}>{med.name}</h3>
+                 <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '2px' }}>Used for: {med.uses || 'General Purpose'}</p>
+                 <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Price: {med.price}</p>
                </div>
             </div>
             
@@ -123,6 +134,22 @@ const Inventory = () => {
                 ) : (
                   <><Check size={18} /> Mark In Stock</>
                 )}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this medicine?')) {
+                    deleteMedicine(med.id);
+                  }
+                }}
+                style={{
+                  color: 'var(--danger)',
+                  borderColor: 'var(--danger)',
+                  padding: '8px 12px'
+                }}
+                title="Delete Medicine"
+              >
+                <Trash2 size={18} />
               </Button>
             </div>
           </Card>

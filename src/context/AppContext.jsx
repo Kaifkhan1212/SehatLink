@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../config/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import {
   mockPatients, mockDoctors, mockPharmacies, mockMedicines,
   initialConsultations, initialPrescriptions, initialHealthRecords,
@@ -188,6 +188,8 @@ export const AppProvider = ({ children }) => {
     const newPrescription = {
       consultationId,
       patientId,
+      doctorId: currentUser?.id || 'unknown',
+      doctorName: currentUser?.name || 'Unknown Doctor',
       date: dateStr,
       medicines: medicinesList,
       notes,
@@ -196,6 +198,9 @@ export const AppProvider = ({ children }) => {
 
     const newHealthRecord = {
       patientId,
+      consultationId, // Optional link
+      doctorId: currentUser?.id || 'unknown',
+      doctorName: currentUser?.name || 'Unknown Doctor',
       date: dateStr,
       condition: condition || 'General Consultation',
       notes: notes,
@@ -228,11 +233,12 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const addMedicine = async (pharmacyId, name, price) => {
+  const addMedicine = async (pharmacyId, name, price, uses) => {
     const newMedicine = {
       pharmacyId,
       name,
       price,
+      uses: uses || 'General Purpose',
       inStock: true,
       createdAt: new Date().toISOString()
     };
@@ -240,6 +246,20 @@ export const AppProvider = ({ children }) => {
       await addDoc(collection(db, 'medicines'), newMedicine);
     } catch (error) {
       console.error('Error adding medicine: ', error);
+    }
+  };
+
+  const deleteMedicine = async (id) => {
+    if (id.startsWith('m') && isNaN(parseInt(id.slice(1)))) {
+      // local update for mock data
+      setMedicines(medicines.filter(m => m.id !== id));
+      return;
+    }
+    try {
+      const docRef = doc(db, 'medicines', id);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting medicine: ', error);
     }
   };
 
@@ -337,7 +357,12 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider value={{
       patients, doctors, pharmacies, medicines, currentUser, isOffline, users,
       consultations, prescriptions, healthRecords, messages, symptomChecks,
-      bookConsultation, updateConsultationStatus, addPrescription, updateMedicineStock, addMedicine, sendMessage,
+      bookConsultation,    updateConsultationStatus,
+    addPrescription,
+    updateMedicineStock,
+    addMedicine,
+    deleteMedicine,
+    sendMessage,
       saveSymptomCheck, createEmergencyConsultation, updateHealthRecord, updatePrescription, updateUserProfile
     }}>
       {children}

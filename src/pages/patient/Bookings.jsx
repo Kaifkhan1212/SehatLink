@@ -147,7 +147,7 @@ const Bookings = () => {
                 <Card key={consult.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <User size={20} className="text-primary"/> {consult.doctorName}
+                      <User size={20} className="text-primary"/> {consult.doctorName || 'Waiting for Doctor...'}
                     </h3>
                     <span style={{ 
                       padding: '4px 12px', 
@@ -165,23 +165,25 @@ const Bookings = () => {
                   </p>
                   <p style={{ marginTop: '8px', fontSize: '14px' }}><strong>Reason:</strong> {consult.symptoms}</p>
                   
-                  {consult.status === 'Approved' && (
+                  {(consult.status === 'Approved' || consult.status === 'Completed') && (
                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                       <Button 
-                         variant="secondary" 
-                         fullWidth 
-                         style={{ display: 'flex', justifyContent: 'center' }}
-                         onClick={() => navigate('/patient-dashboard/consultation', { state: { consultation: consult, isDoctor: false } })}
-                       >
-                         <Video size={18} /> Join Video Call
-                       </Button>
+                       {consult.status === 'Approved' && (
+                         <Button 
+                           variant="secondary" 
+                           fullWidth 
+                           style={{ display: 'flex', justifyContent: 'center' }}
+                           onClick={() => navigate('/patient-dashboard/consultation', { state: { consultation: consult, isDoctor: false } })}
+                         >
+                           <Video size={18} /> Join Video Call
+                         </Button>
+                       )}
                        <Button 
                          variant={activeChatId === consult.id ? "primary" : "outline"} 
                          fullWidth 
                          style={{ display: 'flex', justifyContent: 'center' }}
                          onClick={() => setActiveChatId(activeChatId === consult.id ? null : consult.id)}
                        >
-                         {activeChatId === consult.id ? <><X size={18}/> Close Chat</> : <><MessageSquare size={18} /> Start Text Chat (Low Data)</>}
+                         {activeChatId === consult.id ? <><X size={18}/> Close Chat</> : <><MessageSquare size={18} /> {consult.status === 'Completed' ? 'View Chat History' : 'Start Text Chat (Low Data)'}</>}
                        </Button>
                        
                        {activeChatId === consult.id && (

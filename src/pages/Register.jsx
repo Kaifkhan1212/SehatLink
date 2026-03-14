@@ -11,6 +11,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('patient');
+  const [specialization, setSpecialization] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -33,10 +34,15 @@ const Register = () => {
       return;
     }
 
+    if (role === 'doctor' && !specialization) {
+      setError('Please specify your specialization.');
+      return;
+    }
+
     try {
       setError('');
       setIsSubmitting(true);
-      await register(name, email, password, role);
+      await register(name, email, password, role, specialization);
       // App routes will handle the redirect once AuthContext updates
     } catch (err) {
       console.error(err);
@@ -105,7 +111,10 @@ const Register = () => {
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>I am a...</label>
             <select 
               value={role} 
-              onChange={(e) => setRole(e.target.value)}
+              onChange={(e) => {
+                setRole(e.target.value);
+                if (e.target.value !== 'doctor') setSpecialization('');
+              }}
               style={{ 
                 width: '100%', 
                 padding: '16px', 
@@ -120,6 +129,20 @@ const Register = () => {
               <option value="pharmacist">Pharmacist</option>
             </select>
           </div>
+
+          {role === 'doctor' && (
+            <div style={{ textAlign: 'left' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Specialization</label>
+              <Input 
+                type="text" 
+                placeholder="e.g. Cardiologist, Orthopedic" 
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)}
+                required
+                style={{ fontSize: '18px', padding: '16px' }}
+              />
+            </div>
+          )}
 
           <Button type="submit" size="lg" disabled={isSubmitting} style={{ marginTop: '8px' }}>
             {isSubmitting ? 'Creating Account...' : 'Register'}

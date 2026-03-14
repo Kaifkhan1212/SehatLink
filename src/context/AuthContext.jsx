@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const register = async (name, email, password, role) => {
+  const register = async (name, email, password, role, specialization = '') => {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     
     // Update Firebase Auth Profile
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
         id: user.uid,
         name,
         email,
-        specialization: 'General Physician',
+        specialization: specialization || 'General Physician',
         available: true,
         createdAt: serverTimestamp()
       });

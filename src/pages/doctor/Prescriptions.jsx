@@ -5,8 +5,13 @@ import { FileText, Calendar } from 'lucide-react';
 import '../patient/PatientHome.css';
 
 const Prescriptions = () => {
-  const { doctors, consultations, prescriptions } = useAppContext();
-  const currentDoctor = doctors[0];
+  const { doctors, consultations, prescriptions, currentUser } = useAppContext();
+  
+  // Prioritize real logged-in doctor's specific Firestore data
+  const dbDoctor = doctors.find(d => d.id === currentUser?.id);
+  const currentDoctor = currentUser ? { ...currentUser, ...(dbDoctor || {}) } : null;
+
+  if (!currentDoctor) return <div className="page-container">Loading...</div>;
   
   const myPrescriptions = prescriptions.filter(p => {
      const consult = consultations.find(c => c.id === p.consultationId);

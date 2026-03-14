@@ -17,8 +17,13 @@ SehatLink is a premium TeleHealth platform designed to bridge the gap between ru
 
 ### 📝 Medical Record Management
 *   **Health Profile Customization**: Patients can securely manage their Age, Blood Group, Allergies, and Chronic Conditions.
-*   **Doctor-Managed Prescriptions**: Doctors can add medical notes, prescribe medicines, and attach physical prescription photos.
+*   **Doctor-Managed Prescriptions**: Doctors can add medical notes, prescribe medicines, and attach physical prescription photos. Doctors' names are persisted with the prescriptions they write.
+*   **Chat History Persistence**: Conversations saved natively and viewable even after a consultation has been marked "Completed."
 *   **Automated PDF Reports**: High-quality, branded PDF generation for health records including patient profiles and medical history using `jsPDF`.
+
+### 💊 Pharmacy Portal
+*   **Inventory Tracking**: Pharmacists can add new medicines (including price and what it is `Used For`), update stock status, and permanently delete unavailable medicines.
+*   **Dynamic Local Demand**: Advanced analytics algorithm that continuously calculates and displays the most highly sought-after medicines in the region based on a rolling history of doctors' prescriptions.
 
 ### 🎨 Premium Medical Aesthetics
 *   **Professional UI**: A custom-designed theme featuring a subtle stethoscope SVG background pattern and ambient medical blurs.
@@ -67,8 +72,9 @@ SehatLink is fully responsive, optimized for both desktop browsers and mobile de
 
 ## ⚠️ Troubleshooting
 
-### AI Service (403/404 Errors)
+### AI Service (403/404/429 Errors)
 *   **Model Name**: Ensure you are using `gemini-2.5-flash`.
+*   **429 Error (Too Many Requests)**: You have reached the free tier limit of the Gemini API. Wait about 1-2 minutes before sending another message.
 *   **API Key**: Verify your `VITE_GEMINI_API_KEY` in `.env` is valid and active in the [Google AI Studio](https://aistudio.google.com/).
 *   **Ad-blockers**: Some ad-blockers block requests to `generativelanguage.googleapis.com`. Disable them for this site.
 

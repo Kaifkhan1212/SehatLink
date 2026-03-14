@@ -63,7 +63,17 @@ const HealthChatbot = () => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to reach the AI service.');
+      if (response.status === 429) {
+        throw new Error('You are sending messages too quickly. Please wait a moment and try again.');
+      }
+      try {
+        const errorData = await response.json();
+        console.error("API Error Details:", JSON.stringify(errorData, null, 2));
+        throw new Error(`AI Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
+      } catch (e) {
+        if (e.message.startsWith('AI Error')) throw e; // rethrow if structured
+        throw new Error(`Failed to reach the AI service. Status: ${response.status}`);
+      }
     }
 
     const data = await response.json();
