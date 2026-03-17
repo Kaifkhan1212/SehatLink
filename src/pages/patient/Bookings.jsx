@@ -50,7 +50,8 @@ const Bookings = () => {
     }
 
     try {
-      const result = await fetch('http://localhost:3001/api/create-razorpay-order', {
+      const baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : '';
+      const result = await fetch(`${baseUrl}/api/create-razorpay-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: 250 }),
