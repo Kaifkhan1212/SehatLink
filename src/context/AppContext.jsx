@@ -148,7 +148,7 @@ export const AppProvider = ({ children }) => {
 
   // Actions Using Firebase
 
-  const bookConsultation = async (doctorId, date, symptoms) => {
+  const bookConsultation = async (doctorId, date, symptoms, status = 'Pending') => {
     const doctor = doctors.find(d => d.id === doctorId);
     const newConsultation = {
       patientId: currentUser.id,
@@ -156,7 +156,7 @@ export const AppProvider = ({ children }) => {
       doctorId: doctor ? doctor.id : doctorId,
       doctorName: doctor ? doctor.name : 'Unknown Doctor',
       date,
-      status: 'Pending',
+      status,
       symptoms,
       createdAt: new Date().toISOString()
     };
@@ -179,6 +179,20 @@ export const AppProvider = ({ children }) => {
       await updateDoc(docRef, { status, updatedAt: new Date().toISOString(), ...extraFields });
     } catch (error) {
       console.error('Error updating consultation status: ', error);
+    }
+  };
+
+  const deleteConsultation = async (id) => {
+    if (id.startsWith('c') && isNaN(parseInt(id.slice(1)))) {
+      // local update for mock data
+      setConsultations(consultations.filter(c => c.id !== id));
+      return;
+    }
+    try {
+      const docRef = doc(db, 'appointments', id);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting consultation: ', error);
     }
   };
 
@@ -353,17 +367,49 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const rateDoctor = async (doctorId, newRating) => {
+    try {
+      const doctor = doctors.find(d => d.id === doctorId);
+      if (!doctor) return;
+
+      const currentRating = parseFloat(doctor.rating) || 5.0;
+      const currentCount = parseInt(doctor.ratingCount) || 1;
+
+      const newAvgRating = ((currentRating * currentCount) + newRating) / (currentCount + 1);
+
+      // Update in Doctors collection
+      const docRef = doc(db, 'doctors', doctorId);
+      await updateDoc(docRef, { 
+        rating: newAvgRating.toFixed(1),
+        ratingCount: currentCount + 1,
+        updatedAt: new Date().toISOString() 
+      });
+
+      // Also try to update Users collection sync if they exist there
+      try {
+        const userRef = doc(db, 'users', doctorId);
+        await updateDoc(userRef, {
+          rating: newAvgRating.toFixed(1),
+          ratingCount: currentCount + 1
+        });
+      } catch(e) { /* might not exist in users, ignore */ }
+    } catch (error) {
+      console.error('Error rating doctor:', error);
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       patients, doctors, pharmacies, medicines, currentUser, isOffline, users,
       consultations, prescriptions, healthRecords, messages, symptomChecks,
-      bookConsultation,    updateConsultationStatus,
+      bookConsultation,    updateConsultationStatus, deleteConsultation,
     addPrescription,
     updateMedicineStock,
     addMedicine,
     deleteMedicine,
     sendMessage,
-      saveSymptomCheck, createEmergencyConsultation, updateHealthRecord, updatePrescription, updateUserProfile
+      saveSymptomCheck, createEmergencyConsultation, updateHealthRecord, updatePrescription, updateUserProfile,
+      rateDoctor
     }}>
       {children}
     </AppContext.Provider>

@@ -86,7 +86,7 @@ const DoctorHome = () => {
                 <small className="text-muted">Direct link to an image. Leave blank to use default.</small>
               </div>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Experience</label>
                   <input 
@@ -94,19 +94,6 @@ const DoctorHome = () => {
                     value={profileData.experience}
                     onChange={e => setProfileData({...profileData, experience: e.target.value})}
                     placeholder="e.g. 5+ Yrs"
-                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Star Rating</label>
-                  <input 
-                    type="number" 
-                    step="0.1"
-                    min="1"
-                    max="5"
-                    value={profileData.rating}
-                    onChange={e => setProfileData({...profileData, rating: e.target.value})}
-                    placeholder="e.g. 4.8"
                     style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)' }}
                   />
                 </div>

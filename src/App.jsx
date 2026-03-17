@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
-import Footer from './components/layout/Footer';
+
 
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -40,7 +40,6 @@ function App() {
                 </Route>
               </Routes>
             </Suspense>
-            <Footer />
           </div>
         </Router>
       </AppProvider>

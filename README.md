@@ -14,6 +14,10 @@ SehatLink is a premium TeleHealth platform designed to bridge the gap between ru
 *   **Role-Based Dashboards**: Customized experiences for Patients (Discovery/Booking) and Doctors (Management/Consultation).
 *   **Integrated Communication**: Real-time text chat (for low bandwidth) and integrated Video/Audio call controls.
 *   **Interactive Doctor Discovery**: A flashcard-style, horizontally scrollable carousel for patients to discover available specialists.
+*   **Patient Reviews**: Patients can seamlessly rate doctors from 1 to 5 stars post-consultation to dynamically impact the doctor's platform rating.
+
+### 💳 Payment Gateway
+*   **Razorpay Integration**: A full test-mode payment flow using Razorpay Checkout for booking consultations securely.
 
 ### 📝 Medical Record Management
 *   **Health Profile Customization**: Patients can securely manage their Age, Blood Group, Allergies, and Chronic Conditions.
@@ -53,14 +57,18 @@ SehatLink is a premium TeleHealth platform designed to bridge the gap between ru
    npm install
    ```
 3. Setup Environment Variables:
-   Create a `.env` file in the root directory and add your Firebase configurations:
+   Create a `.env` file in the root directory and add your configurations:
    ```env
+   # Firebase configuration
    VITE_FIREBASE_API_KEY=your_key
    VITE_FIREBASE_AUTH_DOMAIN=your_domain
    VITE_FIREBASE_PROJECT_ID=your_project_id
    VITE_FIREBASE_STORAGE_BUCKET=your_bucket
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_id
    VITE_FIREBASE_APP_ID=your_app_id
+   
+   # Razorpay configuration
+   VITE_RAZORPAY_KEY_ID=your_razorpay_test_key_id
    ```
 4. Start the development server:
    ```bash

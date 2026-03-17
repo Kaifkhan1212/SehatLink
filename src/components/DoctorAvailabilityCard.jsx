@@ -3,7 +3,7 @@ import Card from './ui/Card';
 import Button from './ui/Button';
 import { db } from '../config/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Star } from 'lucide-react';
 
 const DoctorAvailabilityCard = ({ doctor, isEditable = false }) => {
   const [isAvailable, setIsAvailable] = useState(doctor.isAvailable !== false);

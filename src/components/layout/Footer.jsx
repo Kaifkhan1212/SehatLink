@@ -60,15 +60,6 @@ const Footer = () => {
 
         </div>
 
-        {/* Newsletter Section */}
-        <div className="footer-newsletter">
-          <h4>Subscribe to our newsletter</h4>
-          <p>Stay updated on new health features and rural deployment progress.</p>
-          <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="you@domain.com" required />
-            <button type="submit">Subscribe</button>
-          </form>
-        </div>
       </div>
       
       <div className="footer-bottom">

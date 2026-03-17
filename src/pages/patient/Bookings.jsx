@@ -6,12 +6,12 @@ import DoctorAvailabilityCard from '../../components/DoctorAvailabilityCard';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import ChatInterface from '../../components/ui/ChatInterface';
-import { Video, Calendar, User, Clock, MessageSquare, X, CreditCard, ShieldCheck } from 'lucide-react';
+import { Video, Calendar, User, Clock, MessageSquare, X, CreditCard, ShieldCheck, Star } from 'lucide-react';
 import './PatientHome.css'; // Reusing layout styles
 
 const Bookings = () => {
   const navigate = useNavigate();
-  const { doctors, consultations, currentUser, bookConsultation } = useAppContext();
+  const { doctors, consultations, currentUser, bookConsultation, deleteConsultation, rateDoctor, updateConsultationStatus } = useAppContext();
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [date, setDate] = useState('');
   const [symptoms, setSymptoms] = useState('');
@@ -22,27 +22,84 @@ const Bookings = () => {
 
   const myConsultations = consultations.filter(c => c.patientId === currentUser.id);
 
-  const handleBooking = (e) => {
-    e.preventDefault();
-    if (selectedDoctor && date && symptoms) {
-      setShowPaymentModal(true);
-    }
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
   };
 
-  const confirmPaymentAndBook = () => {
+  const handleBooking = async (e) => {
+    e.preventDefault();
+    if (!selectedDoctor || !date || !symptoms) return;
+
     setIsProcessingPayment(true);
-    
-    // Simulate payment processing delay (1.5 seconds)
-    setTimeout(() => {
-      bookConsultation(selectedDoctor, date, symptoms);
-      setShowPaymentModal(false);
+
+    const res = await loadRazorpayScript();
+    if (!res) {
+      alert('Razorpay SDK failed to load. Are you online?');
       setIsProcessingPayment(false);
-      setShowSuccess(true);
-      setDate('');
-      setSymptoms('');
-      setSelectedDoctor(null);
-      setTimeout(() => setShowSuccess(false), 4000);
-    }, 1500);
+      return;
+    }
+
+    try {
+      const result = await fetch('http://localhost:3001/api/create-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 250 }),
+      });
+
+      if (!result.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const order = await result.json();
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'SehatLink Clinic',
+        description: 'Consultation Fee',
+        order_id: order.id,
+        handler: function (response) {
+          bookConsultation(selectedDoctor, date, symptoms, 'Pending');
+          setIsProcessingPayment(false);
+          setShowSuccess(true);
+          setDate('');
+          setSymptoms('');
+          setSelectedDoctor(null);
+          setTimeout(() => setShowSuccess(false), 4000);
+        },
+        prefill: {
+          name: currentUser?.name || 'Patient',
+          email: currentUser?.email || 'patient@example.com',
+          contact: currentUser?.phone || '',
+        },
+        theme: {
+          color: '#0ea5e9',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessingPayment(false);
+          }
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error(error);
+      alert('Error initiating payment');
+      setIsProcessingPayment(false);
+    }
   };
 
   return (
@@ -58,35 +115,7 @@ const Bookings = () => {
         </div>
       )}
 
-      {showPaymentModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ background: 'white', padding: '32px', borderRadius: '12px', width: '90%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px' }}>
-              <CreditCard size={24} className="text-secondary" /> Secure Checkout
-            </h2>
-            <div style={{ marginBottom: '24px' }}>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '8px' }}>Consultation Fee</p>
-              <h3 style={{ fontSize: '24px', color: 'var(--text-main)' }}>₹250</h3>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-              <Input label="Card Number" placeholder="XXXX XXXX XXXX XXXX" maxLength={16} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <Input label="Expiry (MM/YY)" placeholder="MM/YY" maxLength={5} />
-                <Input label="CVV" placeholder="123" type="password" maxLength={3} />
-              </div>
-              <Input label="Cardholder Name" placeholder="Full Name" />
-            </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <Button variant="outline" fullWidth onClick={() => setShowPaymentModal(false)} disabled={isProcessingPayment}>Cancel</Button>
-              <Button fullWidth onClick={confirmPaymentAndBook} disabled={isProcessingPayment}>
-                {isProcessingPayment ? 'Processing...' : 'Pay ₹250'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="grid-2">
         {/* Booking Form */}
@@ -134,7 +163,9 @@ const Bookings = () => {
               />
             </div>
 
-            <Button type="submit" size="lg" fullWidth>Request Consultation</Button>
+            <Button type="submit" size="lg" fullWidth disabled={isProcessingPayment}>
+              {isProcessingPayment ? 'Processing...' : 'Request Consultation (₹250)'}
+            </Button>
           </form>
         </Card>
 
@@ -192,6 +223,56 @@ const Bookings = () => {
                          </div>
                        )}
                      </div>
+                  )}
+
+                  {(consult.status === 'Pending' || consult.status === 'Approved') && (
+                    <div style={{ marginTop: '12px' }}>
+                      <Button 
+                        variant="outline" 
+                        fullWidth 
+                        style={{ display: 'flex', justifyContent: 'center', borderColor: 'var(--danger)', color: 'var(--danger)' }}
+                        onClick={() => {
+                          if(window.confirm('Are you sure you want to cancel this appointment?')){
+                            deleteConsultation(consult.id);
+                          }
+                        }}
+                      >
+                        Cancel Appointment
+                      </Button>
+                    </div>
+                  )}
+
+                  {(consult.status === 'Completed' && !consult.isRated) && (
+                    <div style={{ marginTop: '16px', padding: '12px', backgroundColor: 'var(--bg-color)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                      <p style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>Rate Your Experience</p>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {[...Array(5)].map((_, index) => {
+                          const ratingValue = index + 1;
+                          return (
+                            <button
+                              key={ratingValue}
+                              type="button"
+                              onClick={() => {
+                                rateDoctor(consult.doctorId, ratingValue);
+                                updateConsultationStatus(consult.id, 'Completed', { isRated: true });
+                                alert('Thank you for your rating!');
+                              }}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                            >
+                              <Star size={24} fill="var(--text-muted)" color="var(--text-muted)" onMouseOver={(e) => {e.currentTarget.setAttribute('fill', '#f59e0b');e.currentTarget.setAttribute('color', '#f59e0b')}} onMouseOut={(e) => {e.currentTarget.setAttribute('fill', 'var(--text-muted)');e.currentTarget.setAttribute('color', 'var(--text-muted)')}} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {(consult.status === 'Completed' && consult.isRated) && (
+                    <div style={{ marginTop: '12px' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <ShieldCheck size={16} /> Rating Submitted
+                      </span>
+                    </div>
                   )}
                 </Card>
               ))
