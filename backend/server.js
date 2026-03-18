@@ -19,6 +19,10 @@ const razorpayInstance = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+app.get('/', (req, res) => {
+  res.send('SehatLink API is running successfully!');
+});
+
 app.post('/api/create-razorpay-order', async (req, res) => {
   try {
     const { amount } = req.body;
